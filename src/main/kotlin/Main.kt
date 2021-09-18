@@ -11,6 +11,7 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
+import dev.kord.core.behavior.GuildBehavior
 import dev.kord.core.entity.Member
 import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.event.guild.GuildCreateEvent
@@ -135,42 +136,14 @@ suspend fun main() {
 // When bot is launched
 	bot.on<ReadyEvent> {
 		for (guild in guilds) {
-			val ser = try {
-				database.findOne { Server::id eq guild.id.asString } ?: error("Server not found in the database")
-			} catch (e: Exception) {
-				val members = guild.members.toList().filter { !it.isBot }
-				val cmembers = mutableListOf<CommunityMember>()
-				for (member in members) {
-					with(member) {
-						cmembers.add(CommunityMember(id.asString))
-					}
-				}
-				Server(guild.id.asString, DEFAULT_PREFIX, cmembers)
-				
-			}
-			
-			try {
-				database.write(ser.id, ser)
-				cache[guild.id.asString] = ser
-			} catch (e: Exception) {
-				println(e.message ?: e.cause ?: e)
-			}
+			val ser = getOrCreate(guild)
+			update(ser.id, ser)
 		}
 	}
 // When bot is added to a new guild
 	bot.on<GuildCreateEvent> {
-		if (database.findOne { Server::id eq guild.id.asString } == null) {
-			val members = guild.members.toList().filter { !it.isBot }
-			val cmembers = mutableListOf<CommunityMember>()
-			for (member in members) {
-				with(member) {
-					cmembers.add(CommunityMember(id.asString, 0))
-				}
-				val ser = Server(guild.id.asString, DEFAULT_PREFIX, cmembers)
-				cache[ser.id] = ser
-				database.write(ser.id, ser)
-			}
-		}
+		val ser = getOrCreate(guild)
+		update(ser.id, ser)
 	}
 // When bot is removed from a guild
 	bot.on<GuildDeleteEvent> {
@@ -200,6 +173,33 @@ suspend fun main() {
 	
 	
 	bot.start()
+}
+
+fun update(id: String, ser: Server) {
+	try {
+		database.write(id, ser)
+		cache[id] = ser
+	} catch (e: Exception) {
+		println(e.message ?: e.cause ?: e)
+	}
+}
+
+/**
+ * Get a guild from the database or create if it doesn't exist there
+ *
+ * [guild] -> The guild you'd like to get/add
+ */
+suspend fun getOrCreate(guild: GuildBehavior): Server = try {
+	database.findOne { Server::id eq guild.id.asString } ?: error("Server not found in the database")
+} catch (e: Exception) {
+	val members = guild.members.toList().filter { !it.isBot }
+	val cmembers = mutableListOf<CommunityMember>()
+	for (member in members) {
+		with(member) {
+			cmembers.add(CommunityMember(id.asString))
+		}
+	}
+	Server(guild.id.asString, DEFAULT_PREFIX, cmembers)
 }
 
 /**
@@ -260,3 +260,4 @@ fun botOwner(memberId: Long): Check<*> = {
 fun restart(task: Task) {
 	task.restart()
 }
+
