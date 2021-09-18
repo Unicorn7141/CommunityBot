@@ -1,4 +1,3 @@
-
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingInt
 import com.kotlindiscord.kord.extensions.commands.converters.impl.member
@@ -217,7 +216,7 @@ class CommunityCommands : Extension() {
 								title = "Salary"
 								field("Gained", true) { "```\n$amount ⍟```" }
 								field("Bank", true) { "```\n${money} ⍟```" }
-								field("Next Work", !true) { "Your next work will be available in 4 hours from now" }
+								field("Next Work", !true) { "Your next work will be available in 4 hours" }
 								
 								color = Color(50, 205, 50)
 							}

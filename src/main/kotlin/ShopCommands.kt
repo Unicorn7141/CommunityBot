@@ -77,34 +77,21 @@ class ShopCommands : Extension() {
 						color = message.getAuthorAsMember()?.color() ?: DISCORD_BLURPLE
 					}
 					
-					if (type == Type.All && ser.shop.items.isNotEmpty()) {
+					if (ser.shop.items.isNotEmpty() && ser.shop.items.any { it.type == if (type != Type.All) type else it.type }) {
 						ser.shop.items.forEach { item ->
-							page {
-								with(item) {
-									title = "${type.name}: $name"
-									this@page.description = "**ID: $id**"
-									field("Name", true) { "```\n$name```" }
-									field("Description", true) { "```\n$description```" }
-									field("Price", true) { "```kt\n$price```" }
-									field("Limited Amount?", true) { "```kt\n$isLimited```" }
-									if (isLimited) field("Limit", true) { "```kt\n$limitCount```" }
+							if ((type == Type.All) || (item.type == type)) {
+								page {
+									with(item) {
+										title = "${type.name}: $name"
+										this@page.description = "**ID: $id**"
+										field("Name", true) { "```\n$name```" }
+										field("Description", true) { "```\n$description```" }
+										field("Price", true) { "```kt\n$price```" }
+										field("Limited Amount?", true) { "```kt\n$isLimited```" }
+										if (isLimited) field("Limit", true) { "```kt\n$limitCount```" }
+									}
+									color = message.getAuthorAsMember()?.color() ?: DISCORD_BLURPLE
 								}
-								color = message.getAuthorAsMember()?.color() ?: DISCORD_BLURPLE
-							}
-						}
-					} else if (ser.shop.items.any { it.type == type }) {
-						for (item in ser.shop.items.filter { it.type == type }) {
-							page {
-								with(item) {
-									title = "${type.name}: $name"
-									this@page.description = "**ID: $id**"
-									field("Name", true) { "```\n$name```" }
-									field("Description", true) { "```\n$description```" }
-									field("Price", true) { "```kt\n$price```" }
-									field("Limited Amount?", true) { "```kt\n$isLimited```" }
-									if (isLimited) field("Limit", true) { "```kt\n$limitCount```" }
-								}
-								color = message.getAuthorAsMember()?.color() ?: DISCORD_BLURPLE
 							}
 						}
 					} else {

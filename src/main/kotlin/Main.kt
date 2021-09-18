@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.toList
 import mu.KotlinLogging
 import org.litote.kmongo.*
 import java.time.Instant
+import java.util.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -57,16 +58,27 @@ enum class Type(val type: String) {
 	All("all")
 }
 
-data class Shop(val items: MutableList<Item>)
+data class Shop(val items: MutableList<Item>) {
+	fun itemExists(id: String) = items.any { it.id == id }
+	fun addItem(item: Item) {
+		while (item.id in items.map { it.id }) {
+			item.id = item.generateId()
+		}
+		items.add(item)
+	}
+}
+
 data class Item(
 	val type: Type,
-	val id: String,
+	var id: String,
 	val name: String,
 	val description: String = "",
 	val price: Int = 100,
 	var isLimited: Boolean = false,
 	var limitCount: Int = 0
-)
+) {
+	fun generateId() = UUID.randomUUID().toString().filter { it.isDigit() }
+}
 
 val cache = mutableMapOf<String, Server>()
 lateinit var scheduler: Task
