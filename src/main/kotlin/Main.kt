@@ -1,3 +1,4 @@
+
 import com.kotlindiscord.kord.extensions.DISCORD_BLURPLE
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import com.kotlindiscord.kord.extensions.checks.failed
@@ -24,13 +25,16 @@ import kotlinx.coroutines.flow.toList
 import mu.KotlinLogging
 import org.litote.kmongo.*
 import java.time.Instant
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 val TOKEN = System.getenv("TOKEN") ?: error("Please add TOKEN to your environmental variables")
 val connectURI = System.getenv("CONNECT_URI") ?: error("Please add a mongodb uri to connect with your database")
 val dbclient = KMongo.createClient(connectURI)
 val db: MongoDatabase = dbclient.getDatabase("CommunityBot")
 val database = db.getCollection<Server>("Community")
-const val DEFAULT_PREFIX = "?"
+const val DEFAULT_PREFIX = "!"
 
 data class Server(
 	val id: String,
@@ -97,11 +101,8 @@ suspend fun main() {
 			help {
 				enableBundledExtension = true
 				colour {
-					when (guildId) {
-						null ->
-							DISCORD_BLURPLE
-						else -> message.getAuthorAsMember()?.color() ?: error("Couldn't get member from this message")
-					}
+					if (guildId == null) DISCORD_BLURPLE else message.getAuthorAsMember()?.color()
+															  ?: error("Couldn't get member from this message")
 				}
 				pingInReply = false
 				
