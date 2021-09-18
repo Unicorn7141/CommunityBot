@@ -1,15 +1,12 @@
-import com.kotlindiscord.kord.extensions.DISCORD_BLURPLE
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.converters.impl.*
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.chatCommand
-import com.kotlindiscord.kord.extensions.extensions.chatGroupCommand
 import com.kotlindiscord.kord.extensions.extensions.publicUserCommand
 import com.kotlindiscord.kord.extensions.interactions.respond
 import com.kotlindiscord.kord.extensions.utils.capitalizeWords
 import com.kotlindiscord.kord.extensions.utils.isNullOrBot
 import dev.kord.common.Color
-import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.reply
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.allowedMentions
@@ -307,9 +304,9 @@ class CommunityCommands : Extension() {
             action {
                 val ser = cache[guild?.id?.asString] ?: error("Cannot fetch guild ${guild?.id?.asString}")
                 val gifted = arguments.mem
-                val amount = arguments.amount ?: 100
+                val amount = arguments.amount
                 val gifter = ser.community.find { it.id == message.author!!.id.asString }
-                    ?: error("Cannot find user: ${message.getAuthorAsMember()!!.id.asString} in guild ${ser.id}")
+                             ?: error("Cannot find user: ${message.getAuthorAsMember()!!.id.asString} in guild ${ser.id}")
 
                 if (amount > gifter.money) {
                     message.reply {

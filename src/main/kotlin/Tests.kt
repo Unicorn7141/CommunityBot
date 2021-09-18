@@ -1,22 +1,14 @@
-import com.kotlindiscord.kord.extensions.builders.ExtensibleBotBuilder
 import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalCoalescingDuration
 import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalCoalescingString
 import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalMember
-import com.kotlindiscord.kord.extensions.components.Component
-import com.kotlindiscord.kord.extensions.components.components
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.chatCommand
-import com.kotlindiscord.kord.extensions.extensions.ephemeralUserCommand
 import com.kotlindiscord.kord.extensions.extensions.publicUserCommand
 import com.kotlindiscord.kord.extensions.interactions.respond
 import dev.kord.core.behavior.reply
 import dev.kord.rest.builder.message.create.allowedMentions
-import dev.kord.rest.builder.message.create.embed
-import io.ktor.util.reflect.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class Tests : Extension() {

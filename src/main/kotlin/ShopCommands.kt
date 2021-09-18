@@ -2,12 +2,10 @@ import com.kotlindiscord.kord.extensions.DISCORD_BLURPLE
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.converters.impl.*
 import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.chatCommand
 import com.kotlindiscord.kord.extensions.extensions.chatGroupCommand
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.reply
 import dev.kord.rest.builder.message.create.allowedMentions
-import org.koin.core.qualifier.named
 
 class ShopCommands : Extension() {
     override val name: String
@@ -15,8 +13,13 @@ class ShopCommands : Extension() {
 
 
     class ViewArgs : Arguments() {
-        val category by defaultingEnum("category", "The items in a category (item/role/all)", defaultValue = Type.All, typeName = "Type")
-    }
+		val category by defaultingEnum(
+			"category",
+			"The items in a category (item/role/all)",
+			defaultValue = Type.All,
+			typeName = "Type"
+		)
+	}
 
     class BuyArgs : Arguments() {
         val itemId by string("ID", "The ID of them item you wanna buy")
@@ -130,8 +133,16 @@ class ShopCommands : Extension() {
                         message.reply {
                             allowedMentions()
                             with(arguments) {
-                                val item =
-                                    Item(Type.Role, role.id.asString, role.name, description, price, isLimited, limitCount)
+								val item =
+									Item(
+										Type.Role,
+										role.id.asString,
+										role.name,
+										description,
+										price,
+										isLimited,
+										limitCount
+									)
                                 content = if (item !in ser.shop.items) {
                                     ser.shop.items.add(item)
                                     cache[ser.id] = ser
@@ -181,21 +192,22 @@ class ShopCommands : Extension() {
                 description = "Get yourself something nice from the shop"
 
                 action {
-                    val ser = cache[guild?.id?.asString] ?: error("Cannot fetch guild ${guild?.id?.asString}")
-                    val shop = ser.shop
-                    val itemId = arguments.itemId
-                    val customerId = message.getAuthorAsMember()!!.id.asString
-                    val customer = ser.community.find { it.id == customerId } ?: error("Member $customerId wasn't found in ${guild!!.id.asString}")
-                    val item = shop.items.find { it.id == itemId }
-
-                    message.reply {
-                        allowedMentions()
-                        if (item == null) {
-                            content = "Item with an ID of $itemId could not be found"
-                        } else if (item.type == Type.Role && item in customer.items) {
-                            content = "You already own this item"
-                        } else if (customer.money < item.price) {
-                            content = "You don't have enough money to buy this item"
+					val ser = cache[guild?.id?.asString] ?: error("Cannot fetch guild ${guild?.id?.asString}")
+					val shop = ser.shop
+					val itemId = arguments.itemId
+					val customerId = message.getAuthorAsMember()!!.id.asString
+					val customer = ser.community.find { it.id == customerId }
+								   ?: error("Member $customerId wasn't found in ${guild!!.id.asString}")
+					val item = shop.items.find { it.id == itemId }
+	
+					message.reply {
+						allowedMentions()
+						if (item == null) {
+							content = "Item with an ID of $itemId could not be found"
+						} else if (item.type == Type.Role && item in customer.items) {
+							content = "You already own this item"
+						} else if (customer.money < item.price) {
+							content = "You don't have enough money to buy this item"
                         } else {
                             if (!item.isLimited) {
                                 customer.items.add(item)
