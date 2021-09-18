@@ -208,8 +208,27 @@ class CommunityCommands : Extension() {
 				val ser = cache[guild?.id?.asString] ?: error("Not a valid guild")
 				val cmember = ser.community.filter { it.id == message.author!!.id.asString }[0]
 				with(cmember) {
-					when (lastWork) {
-						null -> {
+					if (lastWork == null) {
+						val amount = Random.nextInt(100, 1000)
+						money += amount
+						message.reply {
+							allowedMentions()
+							embed {
+								title = "Salary"
+								field("Gained", true) { "```\n$amount ⍟```" }
+								field("Bank", true) { "```\n${money} ⍟```" }
+								field("Next Work", !true) { "Your next work will be available in 4 hours from now" }
+								
+								color = Color(50, 205, 50)
+							}
+						}
+						lastWork = LocalDateTime.now().toInstant(ZoneOffset.UTC)
+					} else {
+						if (ChronoUnit.HOURS.between(
+								lastWork,
+								LocalDateTime.now().toInstant(ZoneOffset.UTC)
+							) >= 4
+						) {
 							val amount = Random.nextInt(100, 1000)
 							money += amount
 							message.reply {
@@ -218,50 +237,28 @@ class CommunityCommands : Extension() {
 									title = "Salary"
 									field("Gained", true) { "```\n$amount ⍟```" }
 									field("Bank", true) { "```\n${money} ⍟```" }
-									field("Next Work", !true) { "Your next work will be available in 4 hours from now" }
-									
+									field(
+										"Next Work",
+										true
+									) { "Your next work will be available in 4 hours from now" }
 									color = Color(50, 205, 50)
 								}
 							}
 							lastWork = LocalDateTime.now().toInstant(ZoneOffset.UTC)
-						}
-						else -> {
-							if (ChronoUnit.HOURS.between(
-									lastWork,
-									LocalDateTime.now().toInstant(ZoneOffset.UTC)
-								) >= 4
-							) {
-								val amount = Random.nextInt(100, 1000)
-								money += amount
-								message.reply {
-									allowedMentions()
-									embed {
-										title = "Salary"
-										field("Gained", true) { "```\n$amount ⍟```" }
-										field("Bank", true) { "```\n${money} ⍟```" }
-										field(
-											"Next Work",
-											true
-										) { "Your next work will be available in 4 hours from now" }
-										color = Color(50, 205, 50)
-									}
-								}
-								lastWork = LocalDateTime.now().toInstant(ZoneOffset.UTC)
-							} else {
-								var minutesLeft = ChronoUnit.MINUTES.between(
-									LocalDateTime.now().toInstant(ZoneOffset.UTC),
-									lastWork!!.plus(4, ChronoUnit.HOURS)
-								)
-								val hoursLeft = minutesLeft / 60
-								minutesLeft -= hoursLeft * 60
-								message.reply {
-									allowedMentions()
-									embed {
-										title = "ERROR"
-										field("Cause", true) { "You're on a cooldown" }
-										field("Time Left", true) { "$hoursLeft hours and $minutesLeft minutes" }
-										color = Color(java.awt.Color.RED.rgb)
-									}
+						} else {
+							var minutesLeft = ChronoUnit.MINUTES.between(
+								LocalDateTime.now().toInstant(ZoneOffset.UTC),
+								lastWork!!.plus(4, ChronoUnit.HOURS)
+							)
+							val hoursLeft = minutesLeft / 60
+							minutesLeft -= hoursLeft * 60
+							message.reply {
+								allowedMentions()
+								embed {
+									title = "ERROR"
+									field("Cause", true) { "You're on a cooldown" }
+									field("Time Left", true) { "$hoursLeft hours and $minutesLeft minutes" }
+									color = Color(java.awt.Color.RED.rgb)
 								}
 							}
 						}
@@ -271,8 +268,7 @@ class CommunityCommands : Extension() {
 			}
 		}
 		// Gift
-		chatCommand(::GiftArgs)
-		{
+		chatCommand(::GiftArgs) {
 			name = "gift"
 			aliases = arrayOf("give", "donate")
 			description = "Gift a member a bit of your money"
@@ -300,7 +296,6 @@ class CommunityCommands : Extension() {
 					}
 					val index = ser.community.indexOf(gifter)
 					ser.community[index].money -= amount
-					
 				} else {
 					val giftedMember = ser.community.find { it.id == gifted.id.asString }
 									   ?: error("Cannot find user: ${gifted.id.asString} in guild ${ser.id}")

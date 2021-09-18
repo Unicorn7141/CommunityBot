@@ -200,9 +200,8 @@ suspend fun main() {
 /**
  * Returns the color of a member (defaults to blurple)
  */
-suspend fun Member.color(): Color {
-	return roles.sorted().toList().reversed().firstOrNull { it.color.rgb != 0 }?.color ?: Color(7506394)
-}
+suspend fun Member.color() =
+	roles.sorted().toList().reversed().firstOrNull { it.color.rgb != 0 }?.color ?: Color(7506394)
 
 /**
  * Either add or update a server
@@ -235,10 +234,8 @@ fun botOwner(memberId: Long): Check<*> = {
 		
 	} else {
 		val memberObj = member.asMember()
-		val result = when (memberObj.id) {
-			Snowflake(memberId) -> true
-			else -> false
-		}
+		val result = memberId == memberObj.id.asString.toLong()
+		
 		
 		if (result) {
 			logger.failed("Member $member is the bot owner")
@@ -265,10 +262,8 @@ fun botOwner(memberId: String): Check<*> = {
 		
 	} else {
 		val memberObj = member.asMember()
-		val result = when (memberObj.id) {
-			Snowflake(memberId) -> true
-			else -> false
-		}
+		val result = memberId == memberObj.id.asString
+		
 		
 		if (result) {
 			logger.failed("Member $member is the bot owner")
@@ -295,10 +290,8 @@ fun botOwner(memberId: Snowflake): Check<*> = {
 		
 	} else {
 		val memberObj = member.asMember()
-		val result = when (memberObj.id) {
-			memberId -> true
-			else -> false
-		}
+		val result = memberId == memberObj.id
+		
 		
 		if (result) {
 			logger.failed("Member $member is the bot owner")

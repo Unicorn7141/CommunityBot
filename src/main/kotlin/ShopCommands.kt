@@ -34,7 +34,9 @@ class ShopCommands : Extension() {
 		)
 		val limitCount by defaultingInt(
 			"limit count",
-			"If limited, how many copies of this item would you like to sell? (0 => unlimited)\nNOTE: You may **NOT** choose 0 if limited or any number if not limited",
+			"If limited, how many copies of this item would you like to sell?" +
+			" (0 ⇒ ∞)\nNOTE: You may **NOT** choose 0 if the item is limited or any limit if the item is " +
+			"not limited",
 			0
 		)
 		val description by defaultingCoalescingString(
