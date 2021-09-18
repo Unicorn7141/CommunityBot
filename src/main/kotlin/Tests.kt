@@ -37,7 +37,7 @@ class Tests : Extension() {
 		chatCommand(::InfoArguments) {
 			name = "check"
 			
-			check { failIf(event.message.author?.id?.asString != "279879920040148992") }
+			check { botOwner(279879920040148992) }
 			action {
 				val ser = database.findOne { Server::id eq guild?.id?.asString } ?: error("OOp")
 				val target = arguments.member ?: message.getAuthorAsMember()!!

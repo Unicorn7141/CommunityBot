@@ -121,9 +121,9 @@ suspend fun main() {
 				deleteInvocationOnPaginatorTimeout = !true
 				deletePaginatorOnTimeout = false
 			}
-			add(::CommunityCommands)
-			add(::ShopCommands)
-			add(::Tests)
+			add(::CommunityCommands) // community related commands
+			add(::ShopCommands) // commands regarding the shop
+			//add(::Tests) // test commands
 		}
 		
 		scheduler = Scheduler().schedule(60, name = "readDB") {
@@ -137,10 +137,8 @@ suspend fun main() {
 	bot.on<ReadyEvent> {
 		for (guild in guilds) {
 			val ser = try {
-				println("I know this guild: ${guild.id.asString}")
 				database.findOne { Server::id eq guild.id.asString } ?: error("Server not found in the database")
 			} catch (e: Exception) {
-				println("I added this guild: ${guild.id.asString}")
 				val members = guild.members.toList().filter { !it.isBot }
 				val cmembers = mutableListOf<CommunityMember>()
 				for (member in members) {
@@ -165,7 +163,6 @@ suspend fun main() {
 		try {
 			database.findOne(Server::id eq guild.id.asString)
 		} catch (e: Exception) {
-			println("Added to a new guild: ${guild.id.asString}")
 			val members = guild.members.toList().filter { !it.isBot }
 			val cmembers = mutableListOf<CommunityMember>()
 			for (member in members) {
@@ -180,7 +177,6 @@ suspend fun main() {
 	}
 // When bot is removed from a guild
 	bot.on<GuildDeleteEvent> {
-		println("Removed from guild: ${guild!!.id.asString}")
 		val ser = cache[guildId.asString] ?: error("Guild not found")
 		database.deleteOne(Server::id eq ser.id)
 		cache.remove(ser.id)
@@ -246,63 +242,7 @@ fun botOwner(memberId: Long): Check<*> = {
 		
 	} else {
 		val memberObj = member.asMember()
-		val result = memberId == memberObj.id.asString.toLong()
-		
-		
-		if (result) {
-			logger.failed("Member $member is the bot owner")
-			
-		} else {
-			logger.passed()
-			pass()
-		}
-	}
-}
-
-/**
- * Check if the user is the bot owner or not
- *
- * [memberId] -> The member's ID
- */
-fun botOwner(memberId: String): Check<*> = {
-	val logger = KotlinLogging.logger("com.kotlindiscord.kord.extensions.checks.botOwner")
-	val member = memberFor(event)
-	
-	if (member == null) {
-		logger.nullMember(event)
-		pass()
-		
-	} else {
-		val memberObj = member.asMember()
-		val result = memberId == memberObj.id.asString
-		
-		
-		if (result) {
-			logger.failed("Member $member is the bot owner")
-			
-		} else {
-			logger.passed()
-			pass()
-		}
-	}
-}
-
-/**
- * Check if the user is the bot owner or not
- *
- * [memberId] -> The member's ID
- */
-fun botOwner(memberId: Snowflake): Check<*> = {
-	val logger = KotlinLogging.logger("com.kotlindiscord.kord.extensions.checks.botOwner")
-	val member = memberFor(event)
-	
-	if (member == null) {
-		logger.nullMember(event)
-		pass()
-		
-	} else {
-		val memberObj = member.asMember()
-		val result = memberId == memberObj.id
+		val result = Snowflake(memberId) == memberObj.id
 		
 		
 		if (result) {
