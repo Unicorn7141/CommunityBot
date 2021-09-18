@@ -1,4 +1,3 @@
-
 import com.kotlindiscord.kord.extensions.DISCORD_BLURPLE
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import com.kotlindiscord.kord.extensions.checks.failed
@@ -160,19 +159,17 @@ suspend fun main() {
 	}
 // When bot is added to a new guild
 	bot.on<GuildCreateEvent> {
-		try {
-			database.findOne(Server::id eq guild.id.asString)
-		} catch (e: Exception) {
+		if (database.findOne { Server::id eq guild.id.asString } == null) {
 			val members = guild.members.toList().filter { !it.isBot }
 			val cmembers = mutableListOf<CommunityMember>()
 			for (member in members) {
 				with(member) {
 					cmembers.add(CommunityMember(id.asString, 0))
 				}
+				val ser = Server(guild.id.asString, DEFAULT_PREFIX, cmembers)
+				cache[ser.id] = ser
+				database.write(ser.id, ser)
 			}
-			val ser = Server(guild.id.asString, DEFAULT_PREFIX, cmembers)
-			cache[ser.id] = ser
-			database.write(ser.id, ser)
 		}
 	}
 // When bot is removed from a guild
