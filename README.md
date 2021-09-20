@@ -11,3 +11,21 @@ At the same time this bot is all about kindness and friendship so gifts are a th
 
 But how can it be a GOOD bot without being a little shi*t? So you can also steal and raid 🤣
 
+## TODO List
+- [x] Shop
+  - [x] Add items
+  - [x] Remove items
+  - [x] Buy items 
+- [ ] Currency
+  - [x] Work
+  - [x] Gift
+  - [ ] Steal
+- [ ] Moderation
+  - [ ] Kick
+  - [ ] Ban
+  - [ ] Mute
+- [ ] Info
+  - [ ] Member info
+  - [ ] City info
+  - [ ] Role info
+  - [ ] Moderators info
