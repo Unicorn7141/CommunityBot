@@ -24,6 +24,7 @@ But how can it be a GOOD bot without being a little shi*t? So you can also steal
   - [ ] Kick
   - [ ] Ban
   - [ ] Mute
+  - [x] Prefix
 - [ ] Info
   - [ ] Member info
   - [ ] City info
